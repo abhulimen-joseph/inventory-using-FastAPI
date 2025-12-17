@@ -27,6 +27,33 @@ async def welcome():
 @app.post("/items/", response_model= Item, status_code=201)
 async def create(item: Item):
     global current_db
-    inventory_db.append(item)
     current_db +=1
+    inventory_db.append(item)
     return item
+
+# this gives the values stored in the list
+@app.get("/item/", response_model=List[list])
+async def get_items():
+    return inventory_db
+
+# to get an element in a the list
+@app.get("/items/{item_index}", response_model=Item)
+async def get_item(item_index: int):
+        if item_index < 0 or item_index >= len(inventory_db):
+            raise  HTTPException(status_code=404, detail=f"item at index {item_index} not found")
+        return inventory_db[item_index]
+    
+        
+@app.put("/items/{item_index}", response_model=Item)
+async def update_item(item_index: int, updated_item: Item):
+     if item_index < 0 or item_index >= len(inventory_db):
+          raise HTTPException(status_code=404, detail=f"The item at index {item_index} is not found")
+     inventory_db[item_index] = updated_item
+     return updated_item
+
+@app.delete("/items/{item_index}", status_code=204)
+async def delete_item(item_index: int):
+     if item_index < 0 or item_index >= len(inventory_db):
+          raise HTTPException(status_code=404, detail=f"The index at index {item_index} is not found")
+     del inventory_db[item_index]
+     return
