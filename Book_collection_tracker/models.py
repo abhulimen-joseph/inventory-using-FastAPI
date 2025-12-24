@@ -21,11 +21,11 @@ class BookModel(Base):
     id = Column(Integer, primary_key= True, index=True)
     title = Column(String(200), nullable= False)
     author = Column(String(200), nullable= False)
-    year = Column(int(10))
-    genre = Column(String(200))
+    year = Column(Integer, nullable = True)
+    genre = Column(String(200), nullable = True)
     condition = Column(Enum(BookCondition), default=BookCondition.GOOD)
     read_status = Column(Enum(ReadStatus), default=ReadStatus.STARTED)
-    rating = Column(Integer)
+    rating = Column(Integer, nullable = True)
     notes = Column(Text)
 
     def __repl__(self):

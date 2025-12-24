@@ -4,9 +4,9 @@ from typing import Optional
 class BookCreate(BaseModel):
     title: str
     author: str
-    year: Optional[str]
-    genre: Optional[str]
-    rating: Optional[int]
+    year: Optional[int] = None
+    genre: Optional[str] = None
+    rating: Optional[int] = None
     
 
 
