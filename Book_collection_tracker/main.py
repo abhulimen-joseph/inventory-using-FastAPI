@@ -1,6 +1,6 @@
 import database
 import models
-from schema import BookResponse,BookCreate
+from schema import BookResponse,BookCreate, BookUpdate
 from fastapi import FastAPI,HTTPException, Depends
 from sqlalchemy.orm import Session
 from typing import List
@@ -39,3 +39,33 @@ def get_book(book_id:int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="item not found")
     return db_book
 
+@app.delete("/books/{book_id}", response_model= BookResponse)
+def delete_book(book_id:int, db: Session = Depends(get_db())):
+    db_book = db.query(models.BookModel).filter(models.BookModel.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code = 404, detail="Book not found")
+    
+    deleted_book = db_book
+
+    if db_book:
+        db.delete(db_book)
+        db.commit()
+
+    return deleted_book
+    
+
+@app.put("/books/{book_id}", response_model=BookResponse)
+def update(book_id:int, book: BookUpdate, db: Session = Depends(get_db)):
+    db_book = db.query(models.BookModel).filter(models.BookModel.id == book_id).first()
+    if not db_book:
+        raise HTTPException(status_code= 404, detail= "Book not found")
+
+    updated_book = book.model_dump(exclude_unset= True)
+
+    for key, value in updated_book.items():
+        setattr(db_book, key, value)
+
+    db.commit()
+    db.refresh(db_book)
+
+    return db_book

@@ -8,7 +8,9 @@ class BookCreate(BaseModel):
     genre: Optional[str] = None
     rating: Optional[int] = None
     
-
+class BookUpdate(BookCreate):
+    title: Optional[str] = None
+    author: Optional[str] = None
 
 class BookResponse(BookCreate):
     id: int
