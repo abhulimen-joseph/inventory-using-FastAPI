@@ -19,6 +19,10 @@ class FinanceCreateExpense(BaseModel):
     amount: int
     Destination: str
 
+class FinanceUpdateExpense(FinanceCreateExpense):
+    amount: int
+    Destination: str
+
 class FinanceResponseExpense(FinanceCreateExpense):
     id: int
     date: date

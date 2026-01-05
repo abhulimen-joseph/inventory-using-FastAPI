@@ -50,7 +50,33 @@ def all_expenses(db: Session = Depends(get_db)):
 @app.get("/expenses/{expense_id}", response_model=schemas.FinanceResponseExpense)
 def get_expense(expense_id: int, db: Session = Depends(get_db)):
     expense = db.query(models.Expenses).filter(models.Expenses.id == expense_id).first()
-    if expense_id is None:
+    if expense is None:
         raise HTTPException(status_code=404, detail= "Expense not found")
+    return expense
+
+@app.delete("/expenses/{expense_id}")
+def delete_expense(expense_id: int, db: Session = Depends(get_db)):
+    expense = db.query(models.Expenses).filter(models.Expenses.id == expense_id).first()
+    if expense is None:
+        raise HTTPException(status_code=404, detail= "Expense not found")
+    db.delete(expense)
+    db.commit()
+
+    return {f"detail: expense_id {expense_id} has been deleted"}
+
+@app.put("/expense/{expense_id}", response_model =schemas.FinanceResponseExpense)
+def update_expense(expense_id: int, expense_update: schemas.FinanceUpdateExpense, db:Session = Depends(get_db)):
+    expense = db.query(models.Expenses).filter(models.Expenses.id == expense_id).first()
+    if not expense:
+        raise HTTPException(status_code=404, detail="invalid Expense id")
+    
+    update_data = expense_update.dict(exclude_unset = True)
+
+    for field, value in update_data.items():
+        setattr(expense, field, value)
+
+    db.commit()
+    db.refresh(expense)
+
     return expense
 
