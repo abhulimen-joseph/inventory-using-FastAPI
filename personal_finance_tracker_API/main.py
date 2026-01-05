@@ -1,6 +1,7 @@
 import models
 import schemas
 import database
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, HTTPException, Depends
 models.Base.metadata.create_all(bind = database.engine)
@@ -12,6 +13,16 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def calculate_balance(db:Session):
+    total_income = db.query(func.sum(models.Income.amount).scalar())
+    total_expenses = db.query(func.sum(models.Expenses.amount).scalar())
+    return total_income - total_expenses
+
+@app.get("/balance")
+def get_balance(db: Session = Depends(get_db)):
+    balance = calculate_balance(db)
+    return {f"Balance: {balance}"}
 
 @app.get("/")
 def root():
